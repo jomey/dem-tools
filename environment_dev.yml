@@ -1,0 +1,6 @@
+name: dem-tools
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - pytest
