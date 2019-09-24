@@ -17,7 +17,7 @@ class Process(object):
     def run_command(self):
         if self._run_command is None:
             raise NotImplementedError(
-                'Need to specify the run command in inherited class'
+                'Need to specify the run command or define in inherited class'
             )
         else:
             return self._run_command
