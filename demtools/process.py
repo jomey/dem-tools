@@ -8,15 +8,19 @@ class Process(object):
     LOG_FILE_SUFFIX = '.log'
 
     def __init__(self, **kwargs):
+        self._run_command = kwargs.get('run_command')
         self.run_options = kwargs.get('run_options', [])
         self.log_directory = kwargs.get('log_directory', None)
         self.verbose = kwargs.get('verbose', False)
 
     @property
     def run_command(self):
-        raise NotImplementedError(
-            'Need to specify the run command in inherited class'
-        )
+        if self._run_command is None:
+            raise NotImplementedError(
+                'Need to specify the run command in inherited class'
+            )
+        else:
+            return self._run_command
 
     @property
     def run_options(self):

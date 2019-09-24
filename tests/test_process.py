@@ -29,7 +29,12 @@ class TestProject(object):
         with pytest.raises(NotImplementedError, match=r'inherited class'):
             Process().run_command
 
-    def test_run_command(self, subject):
+    def test_run_command_as_option(self):
+        command = 'test'
+        subject = Process(run_command=command)
+        assert subject.run_command == command
+
+    def test_run_command_as_subclass(self, subject):
         assert subject.run_command == TestProcess.COMMAND
 
     def test_run_options(self, subject, run_options):
