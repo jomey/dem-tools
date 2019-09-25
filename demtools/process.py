@@ -7,6 +7,16 @@ from subprocess import Popen, PIPE, STDOUT, CalledProcessError
 
 
 class Process(object):
+    """
+    Base class that can be inherited from for a specific sub command.
+
+    Each process consists of a mandatory `run_command` that is either given
+    with the initializer or set in child class as a constant.
+
+    Other possible arguments:
+    *run_options*: List of additional arguments given to the command
+    *lod_directory*: Directory to log the output of the command to
+    """
     LOG_FILE_SUFFIX = '.log'
 
     def __init__(self, **kwargs):
@@ -21,6 +31,14 @@ class Process(object):
 
     @run_command.setter
     def run_command(self, value):
+        """
+        Set the command to be executed.
+
+        Will raise an AttributeError if the command can not be found in the
+        system PATH.
+
+        :param value: command to execute
+        """
         bin_path = shutil.which(value)
         if bin_path is None:
             raise AttributeError("Can't find given command in system PATH")
@@ -33,6 +51,12 @@ class Process(object):
 
     @run_options.setter
     def run_options(self, value):
+        """
+        Set the options that are passed with the run command.
+        Must be given as a list, e.g. ['--option1', '--option2 value']
+
+        :param value: List of command arguments.
+        """
         if type(value) is not list:
             raise AttributeError("run options must be a list")
         else:
@@ -40,6 +64,13 @@ class Process(object):
 
     @property
     def run_call(self, verbose=False):
+        """
+        Get the run command with options.
+
+        :param verbose: Print the command to stdout
+
+        :return: List with the run command as first entry
+        """
         run_call = [self.run_command] + self.run_options
 
         if verbose:
@@ -49,6 +80,12 @@ class Process(object):
 
     @property
     def log_file(self):
+        """
+        Log file the output of the command will be saved to.
+        Naming pattern is the run command with a '.log' suffix.
+
+        :return: Path object with log file
+        """
         return self.log_directory.joinpath(
             self.run_command + self.LOG_FILE_SUFFIX
         )
@@ -59,6 +96,11 @@ class Process(object):
 
     @log_directory.setter
     def log_directory(self, value):
+        """
+        The log directory. Setting this to None will disable logging.
+
+        :param value: Absolute path to directory
+        """
         if value is not None:
             self._log_directory = Path(value)
         else:
@@ -77,6 +119,14 @@ class Process(object):
             yield log_file
 
     def run(self, verbose=False, shell=False):
+        """
+        Execute the command with set options.
+        Will raise a CalledProcessError if the return code is other than 0.
+
+        :param verbose: Print the log to STDOUT as well
+        :param shell: Execute the command as a full shell. *Use with caution*.
+        :return: Return code of the command
+        """
         with Popen(self.run_call,
                    stdout=PIPE, stderr=STDOUT,
                    shell=shell, bufsize=1, universal_newlines=True) as pipe:
