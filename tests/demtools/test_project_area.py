@@ -10,7 +10,7 @@ def project_name_prefix():
 
 @pytest.fixture(scope='module')
 def subject(tmp_input_path, project_name_prefix):
-    return ProjectArea(tmp_input_path, project_name_prefix)
+    return ProjectArea(tmp_input_path, name_prefix=project_name_prefix)
 
 
 class TestProjectArea(object):
@@ -20,10 +20,6 @@ class TestProjectArea(object):
     def test_project_prefix_name(self, subject, project_name_prefix):
         assert subject.name_prefix == project_name_prefix
 
-    def test_dg_output_dir(self, subject):
-        assert subject.input_dir.name == ProjectArea.INPUT_DIR_NAME
-        assert subject.input_dir.exists()
-
-    def test_asp_output_dir(self, subject):
-        assert subject.output_dir.name == ProjectArea.OUTPUT_DIR_NAME
-        assert subject.output_dir.exists()
+    def test_add_folder(self, subject):
+        new_folder = subject.add_folder('new_folder')
+        assert new_folder.exists()
