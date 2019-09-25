@@ -65,6 +65,7 @@ class TestProject(object):
             assert 10 == log_file.write('Test entry')
 
     def test_logger_disabled(self, subject):
+        subject.verbose = False
         with subject.logger() as log_file:
             assert log_file.name == os.devnull
 
