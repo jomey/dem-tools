@@ -1,4 +1,6 @@
 import os
+import shutil
+
 from contextlib import contextmanager
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT, CalledProcessError
@@ -8,18 +10,22 @@ class Process(object):
     LOG_FILE_SUFFIX = '.log'
 
     def __init__(self, **kwargs):
-        self._run_command = kwargs.get('run_command')
+        self.run_command = \
+            getattr(self, 'COMMAND', None) or kwargs.get('run_command')
         self.run_options = kwargs.get('run_options', [])
         self.log_directory = kwargs.get('log_directory', None)
 
     @property
     def run_command(self):
-        if self._run_command is None:
-            raise NotImplementedError(
-                'Need to specify the run command or define in inherited class'
-            )
+        return self._run_command
+
+    @run_command.setter
+    def run_command(self, value):
+        bin_path = shutil.which(value)
+        if bin_path is None:
+            raise AttributeError("Can't find given command in system PATH")
         else:
-            return self._run_command
+            self._run_command = value
 
     @property
     def run_options(self):

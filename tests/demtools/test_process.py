@@ -9,10 +9,6 @@ from demtools import Process
 class TestProcess(Process):
     COMMAND = 'time'
 
-    @property
-    def run_command(self):
-        return self.COMMAND
-
 
 @pytest.fixture(scope='module')
 def run_options():
@@ -25,14 +21,15 @@ def subject(run_options, tmp_input_path):
 
 
 class TestProject(object):
-    def test_requires_implemented_run_command(self):
-        with pytest.raises(NotImplementedError, match=r'inherited class'):
-            Process().run_command
+    def test_run_command(self, subject):
+        assert subject.run_command == 'time'
 
-    def test_run_command_as_option(self):
-        command = 'test'
-        subject = Process(run_command=command)
-        assert subject.run_command == command
+    def test_invalid_run_command(self, subject):
+        with pytest.raises(AttributeError, match=r'command in system PATH'):
+            assert Process(run_command='foo')
+
+    def test_command_constant_has_precedence(self, subject):
+        assert TestProcess(run_command='foo')
 
     def test_run_command_as_subclass(self, subject):
         assert subject.run_command == TestProcess.COMMAND
@@ -64,7 +61,7 @@ class TestProject(object):
             assert 10 == log_file.write('Test entry')
 
     def test_logger_disabled(self):
-        subject = Process()
+        subject = TestProcess()
         with subject.logger() as log_file:
             assert log_file.name == os.devnull
 
