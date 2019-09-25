@@ -60,8 +60,13 @@ class TestProject(object):
     def test_logger_enabled(self, subject):
         subject.verbose = True
         with subject.logger() as log_file:
+            assert log_file.name == str(subject.log_file)
             assert subject.log_file.exists()
             assert 10 == log_file.write('Test entry')
+
+    def test_logger_disabled(self, subject):
+        with subject.logger() as log_file:
+            assert log_file.name == os.devnull
 
     def test_run(self, subject):
         subject.verbose = True

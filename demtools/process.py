@@ -75,11 +75,12 @@ class Process(object):
     def logger(self):
         if self.verbose:
             self.__ensure_log_directory()
-            with open(self.log_file, "w") as log_file:
-                yield log_file
+            log_file = self.log_file
         else:
-            with open(os.devnull, "w") as log_file:
-                yield log_file
+            log_file = os.devnull
+
+        with open(log_file, "w") as log_file:
+            yield log_file
 
     def run(self, shell=False):
         with self.logger() as logger:
