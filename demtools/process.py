@@ -11,7 +11,6 @@ class Process(object):
         self._run_command = kwargs.get('run_command')
         self.run_options = kwargs.get('run_options', [])
         self.log_directory = kwargs.get('log_directory', None)
-        self.verbose = kwargs.get('verbose', False)
 
     @property
     def run_command(self):
@@ -37,7 +36,7 @@ class Process(object):
     def run_call(self, verbose=False):
         run_call = [self.run_command] + self.run_options
 
-        if verbose or self.verbose:
+        if verbose:
             print("Executing: " + str(' '.join(run_call)))
 
         return run_call
@@ -56,25 +55,14 @@ class Process(object):
     def log_directory(self, value):
         if value is not None:
             self._log_directory = Path(value)
-
-    @property
-    def verbose(self):
-        return self._verbose
-
-    @verbose.setter
-    def verbose(self, value):
-        self._verbose = value
-
-    def __ensure_log_directory(self):
-        if self.log_directory is None:
-            raise AttributeError("Missing log directory for Process")
-        elif not self.log_directory.exists():
-            self.log_directory.mkdir()
+        else:
+            self._log_directory = None
 
     @contextmanager
     def logger(self):
-        if self.verbose:
-            self.__ensure_log_directory()
+        if self.log_directory is not None:
+            if not self.log_directory.exists():
+                self.log_directory.mkdir()
             log_file = self.log_file
         else:
             log_file = os.devnull
@@ -82,20 +70,21 @@ class Process(object):
         with open(log_file, "w") as log_file:
             yield log_file
 
-    def run(self, shell=False):
-        with self.logger() as logger:
-            with Popen(self.run_call,
-                       stdout=PIPE, stderr=STDOUT,
-                       shell=shell, bufsize=1, universal_newlines=True) as pipe:
+    def run(self, verbose=False, shell=False):
+        with Popen(self.run_call,
+                   stdout=PIPE, stderr=STDOUT,
+                   shell=shell, bufsize=1, universal_newlines=True) as pipe:
+
+            with self.logger() as logger:
                 for line in pipe.stdout:
-                    if self.verbose:
+                    if verbose:
                         print(line)
 
                     logger.write(line)
 
-                pipe.wait()  # Get the return code
+            pipe.wait()  # Get the return code
 
-                if pipe.returncode != 0:
-                    raise CalledProcessError(pipe.returncode, pipe.args)
-                else:
-                    return pipe.returncode
+            if pipe.returncode != 0:
+                raise CalledProcessError(pipe.returncode, pipe.args)
+            else:
+                return pipe.returncode

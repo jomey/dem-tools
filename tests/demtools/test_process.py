@@ -58,22 +58,24 @@ class TestProject(object):
         assert subject.log_directory == tmp_input_path
 
     def test_logger_enabled(self, subject):
-        subject.verbose = True
         with subject.logger() as log_file:
             assert log_file.name == str(subject.log_file)
             assert subject.log_file.exists()
             assert 10 == log_file.write('Test entry')
 
-    def test_logger_disabled(self, subject):
-        subject.verbose = False
+    def test_logger_disabled(self):
+        subject = Process()
         with subject.logger() as log_file:
             assert log_file.name == os.devnull
 
     def test_run(self, subject):
-        subject.verbose = True
-
         assert subject.run() == 0
         assert os.stat(subject.log_file).st_size > 0
+
+    def test_run_verbose(self, subject, capsys):
+        assert subject.run(verbose=True) == 0
+        out, err = capsys.readouterr()
+        assert len(out) > 0
 
     def test_failed_run(self, subject):
         subject.run_options = ['foo']
