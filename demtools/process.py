@@ -12,6 +12,15 @@ class Process(object):
 
     Each process consists of a mandatory `run_command` that is either given
     with the initializer or set in child class as a constant.
+    Examples:
+        * Standalone usage:
+        ::
+            Process(run_command='command')
+
+        * Class inheritance:
+        ::
+            class ChildProcess(Process):
+                RUN_COMMAND = 'command'
 
     Other possible arguments:
     *run_options*: List of additional arguments given to the command
@@ -21,7 +30,7 @@ class Process(object):
 
     def __init__(self, **kwargs):
         self.run_command = \
-            getattr(self, 'COMMAND', None) or kwargs.get('run_command')
+            getattr(self, 'RUN_COMMAND', None) or kwargs.get('run_command')
         self.run_options = kwargs.get('run_options', [])
         self.log_directory = kwargs.get('log_directory', None)
 

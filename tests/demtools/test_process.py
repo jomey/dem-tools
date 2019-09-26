@@ -7,7 +7,7 @@ from demtools import Process
 
 
 class TestProcess(Process):
-    COMMAND = 'time'
+    RUN_COMMAND = 'time'
 
 
 @pytest.fixture(scope='module')
@@ -32,7 +32,7 @@ class TestProject(object):
         assert TestProcess(run_command='foo')
 
     def test_run_command_as_subclass(self, subject):
-        assert subject.run_command == TestProcess.COMMAND
+        assert subject.run_command == TestProcess.RUN_COMMAND
 
     def test_run_options(self, subject, run_options):
         assert subject.run_options == run_options
@@ -43,12 +43,12 @@ class TestProject(object):
 
     def test_run_call(self, subject, run_options):
         assert len(subject.run_call) == \
-               len([TestProcess.COMMAND]) + len(run_options)
+               len([TestProcess.RUN_COMMAND]) + len(run_options)
 
     def test_log_file(self, subject, tmp_input_path):
         assert subject.log_file == \
                tmp_input_path.join(
-                   TestProcess.COMMAND + Process.LOG_FILE_SUFFIX
+                   TestProcess.RUN_COMMAND + Process.LOG_FILE_SUFFIX
                )
 
     def test_log_directory(self, subject, tmp_input_path):
