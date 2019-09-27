@@ -72,22 +72,6 @@ class Process(object):
             self._run_options = value
 
     @property
-    def run_call(self, verbose=False):
-        """
-        Get the run command with options.
-
-        :param verbose: Print the command to stdout
-
-        :return: List with the run command as first entry
-        """
-        run_call = [self.run_command] + self.run_options
-
-        if verbose:
-            print("Executing: " + str(' '.join(run_call)))
-
-        return run_call
-
-    @property
     def log_file(self):
         """
         Log file the output of the command will be saved to.
@@ -127,6 +111,21 @@ class Process(object):
         with open(log_file, "w") as log_file:
             yield log_file
 
+    def run_call(self, verbose=False):
+        """
+        Get the run command with options.
+
+        :param verbose: Print the command to stdout
+
+        :return: List with the run command as first entry
+        """
+        run_call = [self.run_command] + self.run_options
+
+        if verbose:
+            print(f"Executing: {str(' '.join(run_call))}")
+
+        return run_call
+
     def run(self, verbose=False, shell=False):
         """
         Execute the command with set options.
@@ -136,7 +135,7 @@ class Process(object):
         :param shell: Execute the command as a full shell. *Use with caution*.
         :return: Return code of the command
         """
-        with Popen(self.run_call,
+        with Popen(self.run_call(verbose),
                    stdout=PIPE, stderr=STDOUT,
                    shell=shell, bufsize=1, universal_newlines=True) as pipe:
 

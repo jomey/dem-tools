@@ -42,8 +42,14 @@ class TestProject(object):
             TestProcess(run_options='options')
 
     def test_run_call(self, subject, run_options):
-        assert len(subject.run_call) == \
+        assert len(subject.run_call()) == \
                len([TestProcess.RUN_COMMAND]) + len(run_options)
+
+    def test_run_call_verbose(self, subject, capsys):
+        subject.run_call(verbose=True)
+        out, err = capsys.readouterr()
+        assert len(out) > 0
+        assert 'Executing: time' in out
 
     def test_log_file(self, subject, tmp_input_path):
         assert subject.log_file == \
@@ -73,6 +79,8 @@ class TestProject(object):
         assert subject.run(verbose=True) == 0
         out, err = capsys.readouterr()
         assert len(out) > 0
+        assert 'Executing: time' in out     # Verbose output of run_call()
+        assert 'user' in out                # Verbose output of the call itself
 
     def test_failed_run(self, subject):
         subject.run_options = ['foo']
