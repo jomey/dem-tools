@@ -6,7 +6,7 @@ import pytest
 from demtools import Process
 
 
-class TestProcess(Process):
+class SampleProcess(Process):
     RUN_COMMAND = 'time'
 
 
@@ -17,7 +17,7 @@ def run_options():
 
 @pytest.fixture(scope='module')
 def subject(run_options, tmp_input_path):
-    return TestProcess(run_options=run_options, log_directory=tmp_input_path)
+    return SampleProcess(run_options=run_options, log_directory=tmp_input_path)
 
 
 class TestProject(object):
@@ -29,21 +29,21 @@ class TestProject(object):
             assert Process(run_command='foo')
 
     def test_command_constant_has_precedence(self, subject):
-        assert TestProcess(run_command='foo')
+        assert SampleProcess(run_command='foo')
 
     def test_run_command_as_subclass(self, subject):
-        assert subject.run_command == TestProcess.RUN_COMMAND
+        assert subject.run_command == SampleProcess.RUN_COMMAND
 
     def test_run_options(self, subject, run_options):
         assert subject.run_options == run_options
 
     def test_invalid_run_options(self, subject, run_options):
         with pytest.raises(AttributeError, match=r'be a list'):
-            TestProcess(run_options='options')
+            SampleProcess(run_options='options')
 
     def test_run_call(self, subject, run_options):
         assert len(subject.run_call()) == \
-               len([TestProcess.RUN_COMMAND]) + len(run_options)
+               len([SampleProcess.RUN_COMMAND]) + len(run_options)
 
     def test_run_call_verbose(self, subject, capsys):
         subject.run_call(verbose=True)
@@ -54,7 +54,7 @@ class TestProject(object):
     def test_log_file(self, subject, tmp_input_path):
         assert subject.log_file == \
                tmp_input_path.join(
-                   TestProcess.RUN_COMMAND + Process.LOG_FILE_SUFFIX
+                   SampleProcess.RUN_COMMAND + Process.LOG_FILE_SUFFIX
                )
 
     def test_log_directory(self, subject, tmp_input_path):
@@ -67,7 +67,7 @@ class TestProject(object):
             assert 10 == log_file.write('Test entry')
 
     def test_logger_disabled(self):
-        subject = TestProcess()
+        subject = SampleProcess()
         with subject.logger() as log_file:
             assert log_file.name == os.devnull
 
