@@ -24,12 +24,12 @@ class TestProject(object):
     def test_run_command(self, subject):
         assert subject.run_command == 'time'
 
-    def test_invalid_run_command(self, subject):
+    def test_invalid_run_command(self):
         with pytest.raises(AttributeError, match=r'command in system PATH'):
             assert Process(run_command='foo')
 
     def test_command_constant_has_precedence(self, subject):
-        assert SampleProcess(run_command='foo')
+        assert SampleProcess(run_command='foo').run_command == 'time'
 
     def test_run_command_as_subclass(self, subject):
         assert subject.run_command == SampleProcess.RUN_COMMAND
@@ -37,7 +37,7 @@ class TestProject(object):
     def test_run_options(self, subject, run_options):
         assert subject.run_options == run_options
 
-    def test_invalid_run_options(self, subject, run_options):
+    def test_invalid_run_options(self):
         with pytest.raises(AttributeError, match=r'be a list'):
             SampleProcess(run_options='options')
 
