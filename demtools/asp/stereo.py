@@ -12,13 +12,13 @@ class Stereo(Process):
     }
 
     NO_DATA_VALUE = "--nodata-value -32768"
-    MAP_PROJECT_OPTIONS = ['-t dgmaprpc', '--alignment-method None']
+    MAP_PROJECT_OPTIONS = ["-t {0.map_projected}", '--alignment-method None']
+    MAP_PROJECTED_SESSION_TYPES = ['dgmaprpc', 'rpcmaprpc', 'astermaprpc']
     STEREO_ALGORITHM_OPTION = "--stereo-algorithm {0}"
 
     RUN_OPTIONS_FILTER = re.compile(r"(?:-{1,2})([\w-]+)\s+(-?[\w\s]*)")
-    RUN_OPTION_BLACKLIST = [
-        't', 'alignment-method', 'stereo-algorithm'
-    ]
+    STEREO_ALGORITHM_BLACKLIST = ['stereo-algorithm']
+    MAP_PROJECTED_BLACKLIST = ['t', 'alignment-method']
 
     RUN_COMMAND = 'stereo'
 
@@ -39,6 +39,7 @@ class Stereo(Process):
             self._algorithm = int(value)
         else:
             raise AttributeError("Invalid value given for algorithm.")
+        self.filter_run_options(self.STEREO_ALGORITHM_BLACKLIST)
 
     @property
     def map_projected(self):
@@ -46,16 +47,20 @@ class Stereo(Process):
 
     @map_projected.setter
     def map_projected(self, value):
-        self._map_projected = value
+        if value in self.MAP_PROJECTED_SESSION_TYPES:
+            self._map_projected = value
+            self.filter_run_options(self.MAP_PROJECTED_BLACKLIST)
+        else:
+            self._map_projected = None
 
-    def in_option_blacklist(self, option):
+    def in_option_blacklist(self, option, blacklist):
         match = self.RUN_OPTIONS_FILTER.match(option)
-        return match[1] in self.RUN_OPTION_BLACKLIST
+        return match[1] in blacklist
 
-    def filter_run_options(self):
+    def filter_run_options(self, blacklist):
         self.run_options = [
             option for option in self._run_options
-            if not self.in_option_blacklist(option)
+            if not self.in_option_blacklist(option, blacklist)
         ]
 
     def stereo_run_options(self):
@@ -65,12 +70,13 @@ class Stereo(Process):
         ]
 
         if self.map_projected:
-            run_options.extend(self.MAP_PROJECT_OPTIONS)
+            map_options = self.MAP_PROJECT_OPTIONS.copy()
+            map_options[0] = map_options[0].format(self)
+            run_options.extend(map_options)
 
         return run_options
 
     def run_call(self, verbose=False):
-        self.filter_run_options()
         self.run_options = self.stereo_run_options() + self.run_options
 
         return super().run_call(verbose)

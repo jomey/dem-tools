@@ -26,7 +26,7 @@ class TestStereo(object):
                    int(algorithm_value)
 
     def test_map_projected(self):
-        subject = Stereo(map_projected=True)
+        subject = Stereo(map_projected='dgmaprpc')
         run_call = subject.run_call()
         assert '-t dgmaprpc' in run_call
         assert '--alignment-method None' in run_call
@@ -40,7 +40,7 @@ class TestStereo(object):
 
     def test_map_projected_filter_options(self):
         options = ['-t foo', '--alignment-method align']
-        subject = Stereo(map_projected=True, run_options=options)
+        subject = Stereo(map_projected='dgmaprpc', run_options=options)
         run_call = subject.run_call()
         assert '-t dgmaprpc' in run_call
         assert '--alignment-method None' in run_call
@@ -48,7 +48,15 @@ class TestStereo(object):
         assert '--alignment-method align' not in run_call
         assert len(run_call) == 5
 
-    def test_filter_run_options(self):
+    def test_keep_session_type_options(self):
+        options = ['-t pinhole', '--alignment-method affine']
+        subject = Stereo(run_options=options)
+        run_call = subject.run_call()
+        assert '-t pinhole' in run_call
+        assert '--alignment-method affine' in run_call
+        assert len(run_call) == 5
+
+    def test_filter_algorithm_run_options(self):
         subject = Stereo(run_options=['--stereo-algorithm 3'])
         run_call = subject.run_call()
         assert '--stereo-algorithm 3' not in run_call
