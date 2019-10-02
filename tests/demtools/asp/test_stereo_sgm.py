@@ -4,7 +4,9 @@ from demtools.asp import StereoSGM
 
 
 @pytest.mark.parametrize(
-    'mock_run_command', [StereoSGM.RUN_COMMAND], indirect=True
+    'mock_run_command',
+    [[StereoSGM.RUN_COMMAND, 'parallel_stereo']],
+    indirect=True
 )
 @pytest.mark.usefixtures('mock_run_command')
 class TestStereoSGM(object):

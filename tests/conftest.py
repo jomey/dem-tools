@@ -17,9 +17,9 @@ def tmp_input_path(tmpdir_factory):
 @pytest.fixture()
 def mock_run_command(request, monkeypatch, tmpdir_factory):
     bin_dir = tmpdir_factory.mktemp('bin')
-    Path(bin_dir.join(request.param)).touch(mode=0o777)
-    # TODO - Needed for StereoSGM test case.
-    # Can't quite figure out, why mark.parametrize is not working
-    # This should be improved in future revisions.
-    Path(bin_dir.join(f'parallel_{request.param}')).touch(mode=0o777)
+    commands = request.param
+    if type(commands) is not list:
+        commands = [commands]
+    for command in commands:
+        Path(bin_dir.join(command)).touch(mode=0o777)
     monkeypatch.setenv("PATH", str(bin_dir), prepend=os.pathsep)
