@@ -35,6 +35,8 @@ class Stereo(Process):
     def algorithm(self, value):
         if value in self.ALGORITHMS.keys():
             self._algorithm = self.ALGORITHMS[value]
+        elif int(value) in self.ALGORITHMS.values():
+            self._algorithm = int(value)
         else:
             raise AttributeError("Invalid value given for algorithm.")
 

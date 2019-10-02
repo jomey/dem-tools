@@ -11,10 +11,19 @@ class TestStereo(object):
     def test_run(self):
         assert Stereo().run_command == 'stereo'
 
-    def test_algorithm_option(self):
+    def test_algorithm_option_with_keys(self):
         for algorithm in ['Local', 'SGM', 'SSGM', 'MGM']:
             assert Stereo(algorithm=algorithm).algorithm == \
                    Stereo.ALGORITHMS[algorithm]
+
+    def test_algorithm_option_with_values(self):
+        for algorithm_value in [0, 1, 2, 3]:
+            assert Stereo(algorithm=algorithm_value).algorithm == \
+                   algorithm_value
+
+        for algorithm_value in ['0', '1', '2', '3']:
+            assert Stereo(algorithm=algorithm_value).algorithm == \
+                   int(algorithm_value)
 
     def test_map_projected(self):
         subject = Stereo(map_projected=True)
