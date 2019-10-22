@@ -68,3 +68,8 @@ class TestStereo(object):
         assert '--stereo-algorithm 3' not in run_call
         assert '--threads 6' in run_call
         assert '--processes 4' in run_call
+
+    def test_keep_unknown_run_options(self):
+        subject = Stereo(run_options=['path/to/file'])
+        run_call = subject.run_call()
+        assert 'path/to/file' in run_call

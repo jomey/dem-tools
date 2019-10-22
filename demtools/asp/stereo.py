@@ -55,7 +55,7 @@ class Stereo(Process):
 
     def in_option_blacklist(self, option, blacklist):
         match = self.RUN_OPTIONS_FILTER.match(option)
-        return match[1] in blacklist
+        return match[1] in blacklist if match is not None else False
 
     def filter_run_options(self, blacklist):
         self.run_options = [
@@ -80,3 +80,4 @@ class Stereo(Process):
         self.run_options = self.stereo_run_options() + self.run_options
 
         return super().run_call(verbose)
+
