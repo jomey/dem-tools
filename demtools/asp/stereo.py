@@ -53,6 +53,10 @@ class Stereo(Process):
         else:
             self._map_projected = None
 
+    @staticmethod
+    def sgm_algorithm(algorithm_value):
+        return int(algorithm_value) in [1, 2]
+
     def in_option_blacklist(self, option, blacklist):
         match = self.RUN_OPTIONS_FILTER.match(option)
         return match[1] in blacklist if match is not None else False
@@ -80,4 +84,3 @@ class Stereo(Process):
         self.run_options = self.stereo_run_options() + self.run_options
 
         return super().run_call(verbose)
-

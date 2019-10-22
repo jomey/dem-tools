@@ -74,3 +74,8 @@ class TestStereo(object):
         subject = Stereo(run_options=['path/to/file'])
         run_call = subject.run_call()
         assert 'path/to/file' in run_call
+
+    def test_sgm_algorithm(self):
+        assert Stereo.sgm_algorithm('1')
+        assert Stereo.sgm_algorithm(1)
+        assert not Stereo.sgm_algorithm(3)
