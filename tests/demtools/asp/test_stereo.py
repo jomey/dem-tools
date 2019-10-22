@@ -60,7 +60,8 @@ class TestStereo(object):
         subject = Stereo(run_options=['--stereo-algorithm 3'])
         run_call = subject.run_call()
         assert '--stereo-algorithm 3' not in run_call
-        assert '--stereo-algorithm 0' in run_call     # Default Stereo algorithm
+        # Default Stereo algorithm
+        assert '--stereo-algorithm 0' in run_call
 
     def test_keep_custom_run_options(self):
         subject = Stereo(run_options=['--threads 6', '--processes 4'])
